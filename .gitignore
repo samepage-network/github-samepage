@@ -6,3 +6,4 @@ out
 /playwright/.cache/
 coverage
 .env
+private-key.pem
