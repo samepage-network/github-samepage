@@ -28,6 +28,6 @@
   "homepage": "https://github.com/samepage-network/github-samepage#readme",
   "dependencies": {
     "@octokit/rest": "^19.0.7",
-    "samepage": "^0.52.4"
+    "samepage": "^0.55.7"
   }
 }

@@ -16,5 +16,11 @@
     "jsx": "react",
     "baseUrl": "."
   },
-  "include": ["./src"]
+  "include": ["./src", "api/oauth/post.ts", "api/webhook/post.ts"],
+  "ts-node": {
+    "compilerOptions": {
+      "esModuleInterop": true,
+      "module": "commonjs"
+    }
+  }
 }
