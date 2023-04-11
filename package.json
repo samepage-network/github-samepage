@@ -1,6 +1,6 @@
 {
   "name": "github-samepage",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Official GitHub client into the inter-tool protocol, SamePage.",
   "main": "./dist/index.js",
   "scripts": {
