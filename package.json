@@ -29,5 +29,20 @@
   "dependencies": {
     "@octokit/rest": "^19.0.7",
     "samepage": "^0.55.7"
+  },
+  "github": {
+    "steps": [
+      {
+        "title": "Install the SamePage GitHub App",
+        "children": "link",
+        "props": {
+          "href": "https://github.com/apps/samepage-network"
+        }
+      },
+      {
+        "title": "Allow access to your repositories",
+        "children": "image"
+      }
+    ]
   }
 }
