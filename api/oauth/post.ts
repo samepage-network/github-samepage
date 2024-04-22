@@ -1,13 +1,27 @@
 import createAPIGatewayHandler from "samepage/backend/createAPIGatewayProxyHandler";
 import { zOauthRequest, zOauthResponse } from "samepage/internal/types";
+import ServerError from "samepage/backend/ServerError";
+import parseZodError from "samepage/utils/parseZodError";
 import { z } from "zod";
 import axios from "axios";
 import { Octokit } from "@octokit/rest";
 import jsonwebtoken from "jsonwebtoken";
 
+const zCustomParams = z.object({
+  installation_id: z.string(),
+});
+
 const logic = async (
   args: z.infer<typeof zOauthRequest>
 ): Promise<z.infer<typeof zOauthResponse>> => {
+  const customParams = zCustomParams.safeParse(args.customParams);
+  if (!customParams.success) {
+    throw new ServerError(
+      `Failed to parse custom params: ${parseZodError(customParams.error)}`,
+      400
+    );
+  }
+
   const { data } = await axios
     .post<{ access_token: string }>(
       `https://github.com/login/oauth/access_token`,
@@ -48,7 +62,7 @@ const logic = async (
         ),
       }).apps
         .getInstallation({
-          installation_id: Number(args.customParams?.installation_id) || 0,
+          installation_id: Number(customParams.data.installation_id),
         })
         .then((r) => r.data.account?.login ?? "")
     : "";
