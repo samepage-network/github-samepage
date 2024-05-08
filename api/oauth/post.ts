@@ -8,7 +8,7 @@ import { Octokit } from "@octokit/rest";
 import jsonwebtoken from "jsonwebtoken";
 
 const zCustomParams = z.object({
-  installation_id: z.string(),
+  installation_id: z.string().optional(),
 });
 
 const logic = async (
@@ -62,7 +62,7 @@ const logic = async (
         ),
       }).apps
         .getInstallation({
-          installation_id: Number(customParams.data.installation_id),
+          installation_id: Number(customParams.data?.installation_id),
         })
         .then((r) => r.data.account?.login ?? "")
     : "";
