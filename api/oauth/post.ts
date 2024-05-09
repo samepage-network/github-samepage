@@ -73,4 +73,7 @@ const logic = async (
   };
 };
 
-export default createAPIGatewayHandler(logic);
+export default createAPIGatewayHandler({
+  logic,
+  allowedOrigins: [/.*/],
+});
