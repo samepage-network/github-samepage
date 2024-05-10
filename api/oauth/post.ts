@@ -56,8 +56,9 @@ const logic = async (
         code: maskString(args.code),
       };
       console.error(maskedArgs);
-      return Promise.reject(
-        new Error(`Failed to get access token: ${e.response.data}`)
+      throw new ServerError(
+        `Failed to get access token: ${e.response.data}`,
+        401
       );
     });
   const { access_token } = data;
@@ -80,6 +81,21 @@ const logic = async (
           installation_id: Number(customParams.data?.installation_id),
         })
         .then((r) => r.data.account?.login ?? "")
+        .catch((e) => {
+          console.error("Failed to get installation details");
+          console.error(e);
+          console.error("Arguments:");
+          const maskedArgs = {
+            access_token: maskString(access_token),
+            privateKey: maskString(privateKey),
+            installation_id: maskString(customParams.data?.installation_id),
+          };
+          console.error(maskedArgs);
+          throw new ServerError(
+            `Failed to get installation details: ${e.message}`,
+            401
+          );
+        })
     : "";
   return {
     suggestExtension: false,
