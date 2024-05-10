@@ -11,6 +11,13 @@ const zCustomParams = z.object({
   installation_id: z.string().optional(),
 });
 
+const maskString = (s = "") =>
+  `${s
+    .split("")
+    .slice(0, -4)
+    .map(() => "*")
+    .join("")}${s.slice(-4)}`;
+
 const logic = async (
   args: z.infer<typeof zOauthRequest>
 ): Promise<z.infer<typeof zOauthResponse>> => {
@@ -40,11 +47,20 @@ const logic = async (
         },
       }
     )
-    .catch((e) =>
-      Promise.reject(
-        new Error(`Failed to get access token: ${e.response.data}`)
-      )
-    );
+    .catch((e) => {
+      console.error("Failed to fetch access token");
+      console.error(e);
+      console.error("Arguments:");
+      const maskedArgs = {
+        ...args,
+        code: maskString(args.code),
+      };
+      console.error(maskedArgs);
+      throw new ServerError(
+        `Failed to get access token: ${e.response.data}`,
+        401
+      );
+    });
   const { access_token } = data;
   const privateKey = process.env.APP_PRIVATE_KEY;
   const workspace = privateKey
@@ -65,6 +81,21 @@ const logic = async (
           installation_id: Number(customParams.data?.installation_id),
         })
         .then((r) => r.data.account?.login ?? "")
+        .catch((e) => {
+          console.error("Failed to get installation details");
+          console.error(e);
+          console.error("Arguments:");
+          const maskedArgs = {
+            access_token: maskString(access_token),
+            privateKey: maskString(privateKey),
+            installation_id: maskString(customParams.data?.installation_id),
+          };
+          console.error(maskedArgs);
+          throw new ServerError(
+            `Failed to get installation details: ${e.message}`,
+            401
+          );
+        })
     : "";
   return {
     suggestExtension: false,
