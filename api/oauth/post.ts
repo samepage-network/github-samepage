@@ -11,6 +11,13 @@ const zCustomParams = z.object({
   installation_id: z.string().optional(),
 });
 
+const maskString = (s = "") =>
+  `${s
+    .split("")
+    .slice(0, -4)
+    .map(() => "*")
+    .join("")}${s.slice(-4)}`;
+
 const logic = async (
   args: z.infer<typeof zOauthRequest>
 ): Promise<z.infer<typeof zOauthResponse>> => {
@@ -40,11 +47,19 @@ const logic = async (
         },
       }
     )
-    .catch((e) =>
-      Promise.reject(
+    .catch((e) => {
+      console.error("Failed to fetch access token");
+      console.error(e);
+      console.error("Arguments:");
+      const maskedArgs = {
+        ...args,
+        code: maskString(args.code),
+      };
+      console.error(maskedArgs);
+      return Promise.reject(
         new Error(`Failed to get access token: ${e.response.data}`)
-      )
-    );
+      );
+    });
   const { access_token } = data;
   const privateKey = process.env.APP_PRIVATE_KEY;
   const workspace = privateKey
