@@ -63,40 +63,42 @@ const logic = async (
     });
   const { access_token } = data;
   const privateKey = process.env.APP_PRIVATE_KEY;
-  const workspace = privateKey
-    ? await new Octokit({
-        auth: jsonwebtoken.sign(
-          {
-            iss: 312167,
-            iat: Math.floor(Date.now() / 1000),
-            exp: Math.floor(Date.now() / 1000) + 60 * 10,
-          },
-          privateKey,
-          {
-            algorithm: "RS256",
-          }
-        ),
-      }).apps
-        .getInstallation({
-          installation_id: Number(customParams.data?.installation_id),
-        })
-        .then((r) => r.data.account?.login ?? "")
-        .catch((e) => {
-          console.error("Failed to get installation details");
-          console.error(e);
-          console.error("Arguments:");
-          const maskedArgs = {
-            access_token: maskString(access_token),
-            privateKey: maskString(privateKey),
-            installation_id: maskString(customParams.data?.installation_id),
-          };
-          console.error(maskedArgs);
-          throw new ServerError(
-            `Failed to get installation details: ${e.message}`,
-            401
-          );
-        })
-    : "";
+  const installationId = customParams.data?.installation_id;
+  const workspace =
+    privateKey && installationId
+      ? await new Octokit({
+          auth: jsonwebtoken.sign(
+            {
+              iss: 312167,
+              iat: Math.floor(Date.now() / 1000),
+              exp: Math.floor(Date.now() / 1000) + 60 * 10,
+            },
+            privateKey,
+            {
+              algorithm: "RS256",
+            }
+          ),
+        }).apps
+          .getInstallation({
+            installation_id: Number(installationId),
+          })
+          .then((r) => r.data.account?.login ?? "")
+          .catch((e) => {
+            console.error("Failed to get installation details");
+            console.error(e);
+            console.error("Arguments:");
+            const maskedArgs = {
+              access_token: maskString(access_token),
+              privateKey: maskString(privateKey),
+              installation_id: maskString(installationId),
+            };
+            console.error(maskedArgs);
+            throw new ServerError(
+              `Failed to get installation details: ${e.message}`,
+              401
+            );
+          })
+      : "";
   return {
     suggestExtension: false,
     accessToken: access_token,
