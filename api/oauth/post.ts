@@ -61,7 +61,6 @@ const logic = async (
         401
       );
     });
-  console.log(response);
   const { access_token } = response.data;
   const privateKey = process.env.APP_PRIVATE_KEY;
   const installationId = customParams.data?.installation_id;
