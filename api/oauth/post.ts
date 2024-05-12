@@ -29,7 +29,7 @@ const logic = async (
     );
   }
 
-  const { data } = await axios
+  const response = await axios
     .post<{ access_token: string }>(
       `https://github.com/login/oauth/access_token`,
       {
@@ -61,7 +61,8 @@ const logic = async (
         401
       );
     });
-  const { access_token } = data;
+  console.log(response);
+  const { access_token } = response.data;
   const privateKey = process.env.APP_PRIVATE_KEY;
   const installationId = customParams.data?.installation_id;
   const workspace =
